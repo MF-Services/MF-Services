@@ -1,0 +1,50 @@
+[
+  {
+    "_comment": "Placeholder data. Replace with ECO Schulte export from Moritz.",
+    "_shape": "Each entry follows the structure below.",
+    "_example": {
+      "id": "TS-92-B",
+      "name": "ECO Schulte TS 92 B",
+      "enSizes": [3, 4, 5, 6],
+      "type": "overhead",
+      "applications": ["standard", "fireDoor"],
+      "maxLeafWidth": 1400,
+      "maxLeafWeight": 120,
+      "certification": "EN 1154, EN 1634-1",
+      "datasheetUrl": ""
+    }
+  },
+  {
+    "id": "PLACEHOLDER-EN3",
+    "name": "Placeholder EN 3 closer",
+    "enSizes": [3],
+    "type": "overhead",
+    "applications": ["standard"],
+    "maxLeafWidth": 950,
+    "maxLeafWeight": 60,
+    "certification": "EN 1154",
+    "datasheetUrl": ""
+  },
+  {
+    "id": "PLACEHOLDER-EN4",
+    "name": "Placeholder EN 4 closer",
+    "enSizes": [4],
+    "type": "overhead",
+    "applications": ["standard", "fireDoor"],
+    "maxLeafWidth": 1100,
+    "maxLeafWeight": 80,
+    "certification": "EN 1154",
+    "datasheetUrl": ""
+  },
+  {
+    "id": "PLACEHOLDER-EN5",
+    "name": "Placeholder EN 5 closer",
+    "enSizes": [5],
+    "type": "overhead",
+    "applications": ["standard", "fireDoor", "accessible"],
+    "maxLeafWidth": 1250,
+    "maxLeafWeight": 100,
+    "certification": "EN 1154",
+    "datasheetUrl": ""
+  }
+]

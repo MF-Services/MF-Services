@@ -2,10 +2,12 @@
 import { useState } from 'react'
 import CablePlanConfigurator from '../components/CablePlanConfigurator'
 import SpecGenerator from '../components/SpecGenerator'
+import OverpressureCalculator from '../components/OverpressureCalculator'
 
 const TABS = [
   { id: 'hardwareSpec', label: 'Hardware Spec' },
   { id: 'cablePlan', label: 'Cable Plan' },
+  { id: 'overpressure', label: 'Overpressure Calculator' },
 ]
 
 export default function Home() {
@@ -29,8 +31,7 @@ export default function Home() {
                 fontWeight: 600,
                 cursor: 'pointer',
                 background: activeTab === tab.id ? '#00387B' : '#F3F4F6',
-                color: activeTab === tab.id ? '#FFFFFF' : '#6B7280',
-                transition: 'background 150ms, color 150ms',
+                color: activeTab === tab.id ? '#FFFFFF' : '#374151',
               }}
             >
               {tab.label}
@@ -38,9 +39,9 @@ export default function Home() {
           ))}
         </div>
 
-        <div style={{ background: '#FFFFFF', borderRadius: 20, boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-          {activeTab === 'hardwareSpec' ? <SpecGenerator /> : <CablePlanConfigurator />}
-        </div>
+        {activeTab === 'hardwareSpec' && <SpecGenerator />}
+        {activeTab === 'cablePlan' && <CablePlanConfigurator />}
+        {activeTab === 'overpressure' && <OverpressureCalculator />}
       </div>
     </div>
   )
