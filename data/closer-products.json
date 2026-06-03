@@ -1,50 +1,237 @@
 [
   {
-    "_comment": "Placeholder data. Replace with ECO Schulte export from Moritz.",
-    "_shape": "Each entry follows the structure below.",
-    "_example": {
-      "id": "TS-92-B",
-      "name": "ECO Schulte TS 92 B",
-      "enSizes": [3, 4, 5, 6],
-      "type": "overhead",
-      "applications": ["standard", "fireDoor"],
-      "maxLeafWidth": 1400,
-      "maxLeafWeight": 120,
-      "certification": "EN 1154, EN 1634-1",
-      "datasheetUrl": ""
-    }
+    "id": "eco-ts-62",
+    "name": "ECO TS-62",
+    "enRange": "EN 2-5",
+    "enSizes": [2, 3, 4, 5],
+    "type": "overhead",
+    "fireRated": true,
+    "accessible": false,
+    "armEfficiency": 1.0,
+    "deliveryStateSize": 3,
+    "openingMoments": {
+      "2": 20.00,
+      "3": 26.09,
+      "4": 37.68,
+      "5": 54.42
+    },
+    "maxWeightByWidth": {
+      "1250": 180,
+      "1100": 200,
+      "950":  225,
+      "850":  250,
+      "750":  275
+    },
+    "_notes": [
+      "All openingMoments back-calibrated from ECO Toolbox screenshots. Equipment input doesn't change these values for TS-62: imgs B14/B15 (DEFAULT eq) back-solve to the same EN3/EN4 values as the HQ-equipment screenshots.",
+      "Per TS-62 datasheet: EN 2-5, door width ≤1250mm, PMR/DIN 18040/DIN SPEC 1104 compliant, factory delivery at size 3.",
+      "maxWeightByWidth shared with TS-62 G and TS-20 (Decision Guide column 2)."
+    ]
   },
   {
-    "id": "PLACEHOLDER-EN3",
-    "name": "Placeholder EN 3 closer",
-    "enSizes": [3],
+    "id": "eco-ts-62-g",
+    "name": "ECO TS-62 G",
+    "enRange": "EN 2-5",
+    "enSizes": [2, 3, 4, 5],
     "type": "overhead",
-    "applications": ["standard"],
-    "maxLeafWidth": 950,
-    "maxLeafWeight": 60,
-    "certification": "EN 1154",
-    "datasheetUrl": ""
+    "fireRated": true,
+    "accessible": false,
+    "variant": "guide-rail",
+    "armEfficiency": 0.85,
+    "deliveryStateSize": 3,
+    "openingMoments": {
+      "2": 22.03,
+      "3": 29.03,
+      "4": 41.27,
+      "5": 56.06
+    },
+    "maxWeightByWidth": {
+      "1250": 180,
+      "1100": 200,
+      "950":  225,
+      "850":  250,
+      "750":  275
+    },
+    "_notes": [
+      "All openingMoments back-calibrated from screenshots. Equipment input verified not to affect TS-62 G at any size (imgs B16-B19 with DEFAULT equipment match the HQ values exactly).",
+      "G/non-G ratios per size: EN2=1.10, EN3=1.11, EN4=1.10, EN5=1.03."
+    ]
   },
   {
-    "id": "PLACEHOLDER-EN4",
-    "name": "Placeholder EN 4 closer",
-    "enSizes": [4],
+    "id": "eco-ts-61",
+    "name": "ECO TS-61",
+    "enRange": "EN 3-6",
+    "enSizes": [3, 4, 5, 6],
     "type": "overhead",
-    "applications": ["standard", "fireDoor"],
-    "maxLeafWidth": 1100,
-    "maxLeafWeight": 80,
-    "certification": "EN 1154",
-    "datasheetUrl": ""
+    "fireRated": true,
+    "accessible": false,
+    "armEfficiency": 1.0,
+    "deliveryStateSize": 3,
+    "openingMoments": {
+      "3": 26.87,
+      "5": 50.68,
+      "6": 72.00
+    },
+    "maxWeightByWidth": {
+      "1400": 225,
+      "1250": 250,
+      "1100": 275,
+      "950":  300,
+      "850":  325,
+      "750":  350
+    },
+    "_notes": [
+      "openingMoments: EN3, EN5, EN6 all directly back-calculated; values confirmed equal under HQ and DEFAULT equipment (multiple screenshots cross-check).",
+      "EN4 not directly measurable in any screenshot — falls back to DEFAULT_OPENING_MOMENT_NM (37 Nm). Could be anywhere from ~35-38 Nm based on G/non-G ratios at neighbouring sizes.",
+      "Per TS-61 datasheet: EN 3-6, door width ≤1400mm, EN 1154 leaf weights up to 120 kg (extended 250 kg with object-specific declaration). DIN 18040 up to EN 4 only. Delivery at size 3.",
+      "maxWeightByWidth shared with TS-61 G (Decision Guide column 1)."
+    ]
   },
   {
-    "id": "PLACEHOLDER-EN5",
-    "name": "Placeholder EN 5 closer",
-    "enSizes": [5],
+    "id": "eco-ts-61-g",
+    "name": "ECO TS-61 G",
+    "enRange": "EN 3-6",
+    "enSizes": [3, 4, 5, 6],
     "type": "overhead",
-    "applications": ["standard", "fireDoor", "accessible"],
-    "maxLeafWidth": 1250,
-    "maxLeafWeight": 100,
-    "certification": "EN 1154",
-    "datasheetUrl": ""
+    "fireRated": true,
+    "accessible": false,
+    "variant": "guide-rail",
+    "armEfficiency": 0.85,
+    "deliveryStateSize": 3,
+    "openingMoments": {
+      "3": 27.69,
+      "4": 38.81,
+      "5": 54.41,
+      "6": 79.41
+    },
+    "openingMomentsByEquipment": {
+      "default": { "4": 26.87 }
+    },
+    "maxWeightByWidth": {
+      "1400": 225,
+      "1250": 250,
+      "1100": 275,
+      "950":  300,
+      "850":  325,
+      "750":  350
+    },
+    "_notes": [
+      "Primary openingMoments are HQ values: EN3 from img 12, EN4 from old case 9, EN5 from img 13, EN6 from img 14. EN3 confirmed equal under DEFAULT eq (img B20).",
+      "openingMomentsByEquipment.default[4] = 26.87 from img 9 of the second batch — TS-61 G EN4 is the ONLY (product, size) in the entire ~50-case dataset where the Equipment input shifts the opening moment (38.81 → 26.87 under DEFAULT, a 31% drop). Mechanism unknown.",
+      "Per TS-61 datasheet: G variant for opposite-hinge installation. Closing arc 120° (vs 180° for non-G)."
+    ]
+  },
+  {
+    "id": "eco-ts-51",
+    "name": "ECO TS-51",
+    "enRange": "EN 1-4",
+    "enSizes": [1, 2, 3, 4],
+    "type": "overhead",
+    "fireRated": true,
+    "accessible": true,
+    "armEfficiency": 1.0,
+    "openingMoments": {
+      "1": 14.52,
+      "2": 20.31,
+      "3": 26.47,
+      "4": 34.21
+    },
+    "_notes": [
+      "All four sizes back-calibrated from screenshots (HQ equipment): EN1 from old case 8, EN2 from img 16, EN3 from img 17, EN4 from img 18.",
+      "Not listed in the ECO Decision Guide one-pager; no maxWeightByWidth available."
+    ]
+  },
+  {
+    "id": "eco-ts-51-g",
+    "name": "ECO TS-51 G",
+    "enRange": "EN 1-4",
+    "enSizes": [1, 2, 3, 4],
+    "type": "overhead",
+    "fireRated": true,
+    "accessible": true,
+    "variant": "guide-rail",
+    "armEfficiency": 0.85,
+    "openingMoments": {
+      "1": 15.52,
+      "2": 20.31,
+      "3": 27.27,
+      "4": 38.81
+    },
+    "_notes": [
+      "Full EN1-EN4 calibration. Sources: EN1 from img 19 (batch 2), EN2 from img 20 (batch 2), EN3 from img 1 (batch 3), EN4 from img 2 (batch 3).",
+      "G/non-G ratios: EN1=1.07, EN2=1.00, EN3=1.03, EN4=1.13. Notably, TS-51 G EN4 = 38.81 is identical to TS-61 G EN4 — likely a shared mechanism across ECO product families.",
+      "Not listed in the ECO Decision Guide one-pager."
+    ]
+  },
+  {
+    "id": "eco-ts-52",
+    "name": "ECO TS-52",
+    "enRange": "EN 2-5 (B)",
+    "enSizes": [2, 3, 4, 5],
+    "type": "overhead",
+    "fireRated": true,
+    "accessible": false,
+    "variant": "B",
+    "armEfficiency": 1.0,
+    "openingMoments": {
+      "2": 20.97,
+      "3": 27.69,
+      "4": 37.68,
+      "5": 52.11
+    },
+    "_notes": [
+      "Full EN2-EN5 calibration from third batch imgs 3-6 (B variant). Notably, TS-52 (B) EN4 = 37.68 exactly matches TS-62 EN4 — likely shared internal calibration.",
+      "Not listed in the ECO Decision Guide one-pager."
+    ]
+  },
+  {
+    "id": "eco-ts-52-g",
+    "name": "ECO TS-52",
+    "enRange": "EN 2-5 (G)",
+    "enSizes": [2, 3, 4, 5],
+    "type": "overhead",
+    "fireRated": true,
+    "accessible": false,
+    "variant": "G",
+    "armEfficiency": 0.85,
+    "openingMoments": {
+      "2": 21.31,
+      "3": 28.57,
+      "4": 40.00,
+      "5": 55.22
+    },
+    "_notes": [
+      "Full EN2-EN5 calibration from third batch imgs 7-10 (G variant). G/B ratios are very small: 1.02 to 1.06 across the range — much less variant penalty than TS-62 G/TS-62.",
+      "Not listed in the ECO Decision Guide one-pager."
+    ]
+  },
+  {
+    "id": "eco-ts-41",
+    "name": "ECO TS-41",
+    "enRange": "EN 1-4",
+    "enSizes": [1, 2, 3, 4],
+    "type": "overhead",
+    "fireRated": false,
+    "accessible": true,
+    "armEfficiency": 1.0,
+    "deliveryStateSize": 3,
+    "openingMoments": {
+      "1": 16.07,
+      "2": 21.31,
+      "3": 28.13,
+      "4": 37.00
+    },
+    "maxWeightByWidth": {
+      "1100": 130,
+      "950":  150,
+      "850":  170,
+      "750":  190
+    },
+    "_notes": [
+      "Full EN1-EN4 calibration. EN1/EN2/EN3 from third batch imgs 11-13; EN4 = 37 confirmed by both the ECO Newton TS-41 datasheet (DIN 18040 compliance section) and consistent with the matrix-green cells in the screenshots.",
+      "TS-41 is consistently 5-11% higher opening moment than TS-51 at the same EN size (different product family with different gearing).",
+      "Per TS-41 datasheet: EN 1-4, door width ≤1100mm, fully DIN 18040 compliant across all sizes, factory delivery at size 3.",
+      "maxWeightByWidth shared with TS-14 EN and ITS 420 (Decision Guide column 3)."
+    ]
   }
 ]
