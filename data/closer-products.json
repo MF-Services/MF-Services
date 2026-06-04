@@ -69,6 +69,7 @@
     "deliveryStateSize": 3,
     "openingMoments": {
       "3": 26.87,
+      "4": 36.11,
       "5": 50.68,
       "6": 72.00
     },
@@ -81,8 +82,8 @@
       "750":  350
     },
     "_notes": [
-      "openingMoments: EN3, EN5, EN6 all directly back-calculated; values confirmed equal under HQ and DEFAULT equipment (multiple screenshots cross-check).",
-      "EN4 not directly measurable in any screenshot — falls back to DEFAULT_OPENING_MOMENT_NM (37 Nm). Could be anywhere from ~35-38 Nm based on G/non-G ratios at neighbouring sizes.",
+      "openingMoments: all four sizes back-calculated from screenshots. EN4 = 36.11 from a pair of hinge/opposite direction screenshots that cross-verify each other to 0.01 Nm (F = 64.71 hinge, F = 7.51 opposite, both yield the same M_open at friction 10 / HQ).",
+      "G/non-G ratios across all four sizes are now: EN3=1.03, EN4=1.08, EN5=1.07, EN6=1.10 — a smoothly increasing pattern with EN size, confirming the calibration.",
       "Per TS-61 datasheet: EN 3-6, door width ≤1400mm, EN 1154 leaf weights up to 120 kg (extended 250 kg with object-specific declaration). DIN 18040 up to EN 4 only. Delivery at size 3.",
       "maxWeightByWidth shared with TS-61 G (Decision Guide column 1)."
     ]

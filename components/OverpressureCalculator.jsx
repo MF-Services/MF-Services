@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   evaluateCloser,
   findBestRecommendation,
@@ -84,6 +84,7 @@ const CELL = {
 export default function OverpressureCalculator() {
   const [inputs, setInputs] = useState(DEFAULT_INPUTS)
   const [selectedCell, setSelectedCell] = useState(null) // { productId, enSize } | null
+  const [helpOpen, setHelpOpen] = useState(false)
 
   const update = (field, value) =>
     setInputs(prev => ({ ...prev, [field]: value }))
@@ -167,7 +168,7 @@ export default function OverpressureCalculator() {
             gap: 24,
             alignItems: 'start',
           }}>
-            <DataPanel inputs={inputs} update={update} reset={reset} />
+            <DataPanel inputs={inputs} update={update} reset={reset} onHelp={() => setHelpOpen(true)}/>
             <ResultPanel
               matrix={matrix}
               selectedCell={selectedCell}
@@ -184,6 +185,7 @@ export default function OverpressureCalculator() {
           </div>
         </div>
       </div>
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </>
   )
 }
@@ -191,7 +193,7 @@ export default function OverpressureCalculator() {
 // ═══════════════════════════════════════════════════════════════════
 // PANEL 1 — DATA
 // ═══════════════════════════════════════════════════════════════════
-function DataPanel({ inputs, update, reset }) {
+function DataPanel({ inputs, update, reset, onHelp }) {
   return (
     <Panel>
       <PanelHeader number="1" title="Data" subtitle="Please enter your data for the calculation." />
@@ -212,12 +214,12 @@ function DataPanel({ inputs, update, reset }) {
             onChange={v => update('doorWeight', v)} />
         </RowField>
 
-        <RowField label="Distance handle to sash edge" info>
+        <RowField label="Distance handle to sash edge" info onInfoClick={onHelp}>
           <UnitInput value={inputs.handleToEdge} step={0.01} unit="m" max={INPUT_MAX.handleToEdge}
             onChange={v => update('handleToEdge', v)} />
         </RowField>
 
-        <RowField label="Overpressure direction" info align="start">
+        <RowField label="Overpressure direction" info align="start" onInfoClick={onHelp}>
           <RadioGroup
             value={inputs.overpressureDirection}
             onChange={v => update('overpressureDirection', v)}
@@ -233,7 +235,7 @@ function DataPanel({ inputs, update, reset }) {
             onChange={v => update('pressureDifference', v)} />
         </RowField>
 
-        <RowField label="Friction torque estimated" info>
+        <RowField label="Friction torque estimated" info onInfoClick={onHelp}>
           <UnitInput value={inputs.frictionTorque} step={0.5} unit="Nm" max={INPUT_MAX.frictionTorque}
             onChange={v => update('frictionTorque', v)} />
         </RowField>
@@ -547,7 +549,7 @@ function PanelHeader({ number, title, subtitle }) {
   )
 }
 
-function RowField({ label, info, align = 'center', children }) {
+function RowField({ label, info, align = 'center', onInfoClick, children }) {
   return (
     <div style={{
       display: 'grid',
@@ -557,30 +559,132 @@ function RowField({ label, info, align = 'center', children }) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: T.textBody, fontSize: 13, fontWeight: 600, paddingTop: align === 'start' ? 8 : 0 }}>
         <span>{label}</span>
-        {info && <InfoIcon />}
+        {info && <InfoIcon onClick={onInfoClick} />}
       </div>
       <div>{children}</div>
     </div>
   )
 }
 
-function InfoIcon() {
+function InfoIcon({ onClick }) {
+  // Renders as a button when onClick is provided so the icon is keyboard-
+  // focusable and screen-reader-discoverable. Falls back to a static span
+  // for callers that don't want it interactive.
+  const baseStyle = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 14,
+    height: 14,
+    borderRadius: '50%',
+    border: `1px solid ${T.textMuted}`,
+    color: T.textMuted,
+    fontSize: 10,
+    fontStyle: 'italic',
+    fontWeight: 600,
+  }
+  if (!onClick) return <span style={baseStyle}>i</span>
   return (
-    <span style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: 14,
-      height: 14,
-      borderRadius: '50%',
-      border: `1px solid ${T.textMuted}`,
-      color: T.textMuted,
-      fontSize: 10,
-      fontStyle: 'italic',
-      fontWeight: 600,
-    }}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Show help diagram"
+      style={{
+        ...baseStyle,
+        cursor: 'pointer',
+        background: 'transparent',
+        padding: 0,
+      }}
+    >
       i
-    </span>
+    </button>
+  )
+}
+
+// ─── HELP MODAL ──────────────────────────────────────────────────
+// Shared by all three info icons in DataPanel (Distance handle, Direction,
+// Friction). The diagram lives at /public/overpressure-help.png — Next.js
+// serves it at /overpressure-help.png (no /public/ prefix in URLs).
+function HelpModal({ open, onClose }) {
+  // Close on ESC. The effect short-circuits when closed, so there's no
+  // listener bound while the modal is hidden.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onClose])
+
+  if (!open) return null
+
+  return (
+    <div
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Help"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(15, 28, 46, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: 24,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: T.surface,
+          borderRadius: 8,
+          maxWidth: 900,
+          width: '100%',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          padding: 32,
+          position: 'relative',
+          boxShadow: '0 20px 60px rgba(15, 28, 46, 0.25)',
+        }}
+      >
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}>
+          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: T.textPrimary }}>
+            Help
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close help"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              fontSize: 24,
+              cursor: 'pointer',
+              padding: 4,
+              color: T.textMuted,
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        </div>
+        <img
+          src="/overpressure-help.png"
+          alt="Diagram explaining overpressure direction, distance handle to sash edge, and friction torque"
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block',
+          }}
+        />
+      </div>
+    </div>
   )
 }
 
