@@ -213,7 +213,7 @@ export default function SpecGenerator() {
   return (
     <div style={{ minHeight: "100vh", background: T.canvas, fontFamily: "DM Sans, sans-serif", color: T.textBody }}>
       {/* ── HEADER ── */}
-      <header className="mf-app-header" style={{ background: T.navy, borderBottom: `3px solid ${T.orange}`, padding: "0 32px", position: "sticky", top: 0, zIndex: 100, boxShadow: shadow.md }}>
+      <header className="mf-app-header" style={{  background: T.navy, borderBottom: `3px solid ${T.orange}`, padding: "0 32px", borderRadius: 12, boxShadow: shadow.md, marginBottom: 20 }}>
         <div className="mf-header-inner" style={{ maxWidth: 1000, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64, gap: 16 }}>
           <div className="mf-header-row" style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <img src="/linkedin.jpg" alt="MF Services" style={{ height: 40, width: "auto", borderRadius: 4, background: "#ffffff" }} />
