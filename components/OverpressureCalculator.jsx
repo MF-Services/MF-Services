@@ -400,15 +400,12 @@ function SelectionPanel({ selection, doorMoments, doorWeight, doorWidthMm, direc
 
   const { product, enSize, evaluation } = selection
   const isOpposite = direction === 'opposite'
-  // The "primary" status under the force display matches whatever the
-  // matrix evaluates against — opening criterion for hinge-side,
-  // closing criterion for opposite-side (matches ECO Toolbox layout).
-  const primaryOk = isOpposite
-    ? evaluation.canClose
-    : (evaluation.forceAtPusher <= MAX_OPENING_FORCE_N && evaluation.forceAtPusher >= 0)
+  // The matrix already classifies cells as within / smaller / unfit via
+  // evaluation.state — Panel 3 just mirrors that, so we only need the
+  // direction-dependent text for the failure case.
   const primaryFailText = isOpposite
-    ? 'Not suitable for closing the door against the overpressure.'
-    : `Not suitable to open the door with < ${MAX_OPENING_FORCE_N} N force.`
+  ? 'Not suitable for closing the door against the overpressure.'
+  : `Not suitable to open the door with < ${MAX_OPENING_FORCE_N} N force.`
 
   // Negative force or near-zero with opposite direction = overpressure is doing the user's work.
   const overpressureAssists = isOpposite && evaluation.forceAtPusher < evaluation.forceWithoutOverpressure
@@ -440,11 +437,7 @@ function SelectionPanel({ selection, doorMoments, doorWeight, doorWidthMm, direc
             )}
           </span>
         </div>
-        <StatusLine
-          ok={primaryOk}
-          okText="Within the setting recommendation according to EN 1154."
-          failText={primaryFailText}
-        />
+        <MatrixStatusLine state={evaluation.state} unfitText={primaryFailText} />
       </div>
 
       <div style={{ marginBottom: 20 }}>
@@ -834,6 +827,28 @@ function StatusLine({ ok, okText, failText }) {
       <span style={{ color: ok ? T.greenDark : T.red, fontSize: 13, fontWeight: 500 }}>
         {ok ? okText : failText}
       </span>
+    </div>
+  )
+}
+
+// Used in Panel 3 to keep the displayed status consistent with the cell
+// the user clicked — within/smaller/unfit instead of a binary ok/fail.
+function MatrixStatusLine({ state, unfitText }) {
+  const text = {
+    [CELL.WITHIN]:  'Within the setting recommendation according to EN 1154.',
+    [CELL.SMALLER]: 'Smaller than the setting recommendation according to EN 1154.',
+    [CELL.UNFIT]:   unfitText,
+  }[state]
+  const color = {
+    [CELL.WITHIN]:  T.greenDark,
+    [CELL.SMALLER]: T.yellow,
+    [CELL.UNFIT]:   T.red,
+  }[state]
+  if (!text) return null
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <CellIcon state={state} inline />
+      <span style={{ color, fontSize: 13, fontWeight: 500 }}>{text}</span>
     </div>
   )
 }
