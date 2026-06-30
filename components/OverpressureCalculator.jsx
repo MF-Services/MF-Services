@@ -114,24 +114,21 @@ export default function OverpressureCalculator() {
   )
 
   // ─── Selection (panel 3) ──────────────────────────────────────
-  // Auto-pick the best recommendation, matrix click overrides.
+  // Panel 3 is empty until the user actively clicks a cell in panel 2.
+  // We no longer auto-populate it with findBestRecommendation, so users
+  // make an explicit choice rather than seeing pre-baked results.
   const activeSelection = useMemo(() => {
-    if (selectedCell) {
-      const row = matrix.find(r => r.product.id === selectedCell.productId)
-      const cell = row?.cells.find(c => c.enSize === selectedCell.enSize)
-      if (row && cell && cell.state !== 'na') {
-        return { product: row.product, enSize: cell.enSize, evaluation: cell }
-      }
+    if (!selectedCell) return null
+    const row = matrix.find(r => r.product.id === selectedCell.productId)
+    const cell = row?.cells.find(c => c.enSize === selectedCell.enSize)
+    if (row && cell && cell.state !== 'na') {
+      return { product: row.product, enSize: cell.enSize, evaluation: cell }
     }
-    return findBestRecommendation(inputs, closerProducts)
-  }, [selectedCell, matrix, inputs])
+    return null
+  }, [selectedCell, matrix])
 
   return (
     <>
-      {/* Container queries (not media queries) — the grid stacks based on
-          the calculator's own container width, not the viewport. This
-          matters because the app shell around this component may be
-          narrower than the viewport (sidebar, max-width app layout, etc). */}
       <style>{`
         .op-wrapper {
           container-name: op-calc;
@@ -234,6 +231,9 @@ function IntroSection() {
             This tool helps you choose a suitable <strong>door closer</strong> —
             the arm that pulls the door shut automatically — that works for these
             doors: easy enough to open by hand, strong enough to close on its own.
+          </p>
+          <p>
+            It also complies with Part M Guidance.
           </p>
         </div>
 
@@ -563,9 +563,39 @@ function SelectionPanel({ selection, doorMoments, doorWeight, doorWidthMm, direc
   if (!selection) {
     return (
       <Panel>
-        <PanelHeader number="3" title="Your selection" subtitle="No closer matches the scenario." />
-        <div style={{ color: T.textMuted, fontSize: 14, padding: '40px 0', textAlign: 'center' }}>
-          Adjust the inputs to see a recommendation.
+        <PanelHeader
+          number="3"
+          title="Your selection"
+          subtitle="Pick a closer from the matrix to see the details."
+        />
+        <div style={{
+          color: T.textMuted,
+          fontSize: 13,
+          padding: '48px 24px 32px',
+          textAlign: 'center',
+          lineHeight: 1.6,
+        }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '10px 16px',
+            background: T.surface,
+            border: `1px dashed ${T.borderStrong}`,
+            borderRadius: 999,
+            marginBottom: 16,
+          }}>
+            <CellIcon state={CELL.WITHIN} />
+            <CellIcon state={CELL.SMALLER} />
+            <CellIcon state={CELL.UNFIT} />
+          </div>
+          <div style={{ color: T.textBody, fontWeight: 600, fontSize: 14, marginBottom: 6 }}>
+            Click any cell in panel 2
+          </div>
+          <div style={{ maxWidth: 280, margin: '0 auto' }}>
+            See the force at the handle, whether the door will close,
+            and the full breakdown of numbers for that closer.
+          </div>
         </div>
       </Panel>
     )
