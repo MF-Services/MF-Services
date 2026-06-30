@@ -114,24 +114,21 @@ export default function OverpressureCalculator() {
   )
 
   // ─── Selection (panel 3) ──────────────────────────────────────
-  // Auto-pick the best recommendation, matrix click overrides.
+  // Panel 3 is empty until the user actively clicks a cell in panel 2.
+  // We no longer auto-populate it with findBestRecommendation, so users
+  // make an explicit choice rather than seeing pre-baked results.
   const activeSelection = useMemo(() => {
-    if (selectedCell) {
-      const row = matrix.find(r => r.product.id === selectedCell.productId)
-      const cell = row?.cells.find(c => c.enSize === selectedCell.enSize)
-      if (row && cell && cell.state !== 'na') {
-        return { product: row.product, enSize: cell.enSize, evaluation: cell }
-      }
+    if (!selectedCell) return null
+    const row = matrix.find(r => r.product.id === selectedCell.productId)
+    const cell = row?.cells.find(c => c.enSize === selectedCell.enSize)
+    if (row && cell && cell.state !== 'na') {
+      return { product: row.product, enSize: cell.enSize, evaluation: cell }
     }
-    return findBestRecommendation(inputs, closerProducts)
-  }, [selectedCell, matrix, inputs])
+    return null
+  }, [selectedCell, matrix])
 
   return (
     <>
-      {/* Container queries (not media queries) — the grid stacks based on
-          the calculator's own container width, not the viewport. This
-          matters because the app shell around this component may be
-          narrower than the viewport (sidebar, max-width app layout, etc). */}
       <style>{`
         .op-wrapper {
           container-name: op-calc;
@@ -139,6 +136,15 @@ export default function OverpressureCalculator() {
         }
         @container op-calc (max-width: 1240px) {
           .op-grid { grid-template-columns: 1fr !important; }
+        }
+        @container op-calc (max-width: 900px) {
+          .op-intro-grid { grid-template-columns: 1fr !important; }
+          .op-intro-grid > div:last-child {
+            border-left: none !important;
+            border-top: 1px solid #E2E8F0 !important;
+            padding-left: 0 !important;
+            padding-top: 16px !important;
+          }
         }
       `}</style>
 
@@ -161,6 +167,8 @@ export default function OverpressureCalculator() {
               </div>
             </div>
           </header>
+
+          <IntroSection />
 
           <div className="op-grid" style={{
             display: 'grid',
@@ -191,6 +199,171 @@ export default function OverpressureCalculator() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// INTRO SECTION — sits above the three-panel calculator. Plain-English
+// description for first-time visitors plus an expandable "How does this
+// work?" block for the deeper EN 1154 / matrix / direction details.
+// ═══════════════════════════════════════════════════════════════════
+function IntroSection() {
+  const [howOpen, setHowOpen] = useState(false)
+
+  return (
+    <section style={{
+      background: T.surface,
+      borderRadius: 12,
+      padding: '24px 28px',
+      marginBottom: 20,
+      boxShadow: shadow.sm,
+    }}>
+      <div className="op-intro-grid" style={{
+        display: 'grid',
+        gridTemplateColumns: '1.5fr 1fr',
+        gap: 32,
+        alignItems: 'start',
+      }}>
+        <div>
+          <p style={{ color: T.textBody, fontSize: 15, lineHeight: 1.65, margin: 0 }}>
+            Some doors are harder to open because the air pressure on one side pushes
+            back. This often happens with stairwell doors and doors near strong
+            ventilation. The requirements for door design in this situation are particularly important,
+            a max opening force of 100 N must be maintained, the exit door must close against the overpressure etc.
+          </p>
+          <p style={{ color: T.textBody, fontSize: 15, lineHeight: 1.65, margin: 0 }}>
+            This tool helps you choose a suitable <strong>door closer</strong> —
+            the arm that pulls the door shut automatically — that works for these
+            doors: easy enough to open by hand, strong enough to close on its own.
+          </p>
+          <p>
+            It also complies with Part M Guidance.
+          </p>
+        </div>
+
+        <div style={{ borderLeft: `2px solid ${T.border}`, paddingLeft: 24 }}>
+          <Step n="1" title="Enter your door details"
+                body="Width, height, weight, and the pressure pushing on it" />
+          <Step n="2" title="Pick a door closer"
+                body="Green ticks are recommended; click any cell for details" />
+          <Step n="3" title="Review the numbers"
+                body="How hard the door is to open, and whether it'll close" />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setHowOpen(o => !o)}
+        aria-expanded={howOpen}
+        style={{
+          marginTop: 18,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          fontSize: 13,
+          fontWeight: 600,
+          color: T.blue,
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        <span style={{
+          display: 'inline-block',
+          transition: 'transform 0.2s',
+          transform: howOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+        }}>▸</span>
+        How does this calculator work?
+      </button>
+
+      {howOpen && <HowItWorks />}
+    </section>
+  )
+}
+
+function Step({ n, title, body }) {
+  return (
+    <div style={{ display: 'flex', gap: 12, marginBottom: 14, alignItems: 'flex-start' }}>
+      <span style={{
+        flexShrink: 0,
+        width: 26, height: 26,
+        borderRadius: '50%',
+        background: T.orange,
+        color: T.white,
+        fontSize: 13, fontWeight: 700,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        marginTop: 1,
+      }}>
+        {n}
+      </span>
+      <div>
+        <div style={{ color: T.textPrimary, fontWeight: 600, fontSize: 14, lineHeight: 1.3 }}>{title}</div>
+        <div style={{ color: T.textMuted, fontSize: 12, marginTop: 3, lineHeight: 1.4 }}>{body}</div>
+      </div>
+    </div>
+  )
+}
+
+function HowItWorks() {
+  return (
+    <div style={{
+      marginTop: 14,
+      padding: '16px 20px',
+      background: T.surface2,
+      borderRadius: 8,
+      fontSize: 13,
+      lineHeight: 1.65,
+      color: T.textBody,
+    }}>
+      <H4>Why overpressure matters</H4>
+      <p style={{ margin: '4px 0 12px' }}>
+        Mechanical ventilation, stairwell pressurisation, and HVAC systems create air
+        pressure differences between rooms. When you try to open a door from the
+        lower-pressure side, the air pushes against the door, adding to the force you'd
+        normally need.
+      </p>
+
+      <H4>What this calculates</H4>
+      <p style={{ margin: '4px 0 12px' }}>
+        For each closer model and EN size, it adds together the closer's spring
+        strength, the friction in hinges and seals, and the push from the pressure
+        difference. The result is the force you'd feel at the door handle.
+        {' '}<strong>EN 1154</strong> sets
+        {' '}<strong>100 N</strong> as the safe maximum, so children and people with
+        limited mobility can still open the door.
+      </p>
+
+      <H4>Reading the matrix</H4>
+      <ul style={{ margin: '4px 0 12px', paddingLeft: 20 }}>
+        <li style={{ marginBottom: 4 }}><strong style={{ color: T.greenDark }}>Green ✓</strong> — Closer is within the EN 1154 recommendation for this door</li>
+        <li style={{ marginBottom: 4 }}><strong style={{ color: '#A88B1F' }}>Yellow ✓</strong> — Works, but smaller than the recommended EN size for this width</li>
+        <li style={{ marginBottom: 4 }}><strong style={{ color: T.red }}>Red ✗</strong> — Cannot safely handle this scenario</li>
+        <li style={{ marginBottom: 4 }}><strong>—</strong> — This EN size isn't available for this product</li>
+      </ul>
+
+      <H4>Hinge vs opposite direction</H4>
+      <p style={{ margin: '4px 0 0' }}>
+        Direction matters. If overpressure pushes the door open (hinge-side pressure),
+        the closer has to fight it to close. If it pushes the door closed (opposite-side
+        pressure), the user has to fight it to open — but the closer is helped.
+      </p>
+    </div>
+  )
+}
+
+function H4({ children }) {
+  return (
+    <h4 style={{
+      color: T.textPrimary,
+      fontSize: 12,
+      fontWeight: 700,
+      margin: '14px 0 4px',
+      textTransform: 'uppercase',
+      letterSpacing: 0.4,
+    }}>
+      {children}
+    </h4>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // PANEL 1 — DATA
 // ═══════════════════════════════════════════════════════════════════
 function DataPanel({ inputs, update, reset, onHelp }) {
@@ -199,17 +372,17 @@ function DataPanel({ inputs, update, reset, onHelp }) {
       <PanelHeader number="1" title="Data" subtitle="Please enter your data for the calculation." />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <RowField label="Door width">
+        <RowField label="Door width" hint="Typical interior doors are 0.8–1.2 m">
           <UnitInput value={inputs.doorWidth} step={0.01} unit="m" max={INPUT_MAX.doorWidth}
             onChange={v => update('doorWidth', v)} />
         </RowField>
 
-        <RowField label="Door height">
+        <RowField label="Door height" hint="Standard doors are 2.0–2.2 m">
           <UnitInput value={inputs.doorHeight} step={0.01} unit="m" max={INPUT_MAX.doorHeight}
             onChange={v => update('doorHeight', v)} />
         </RowField>
 
-        <RowField label="Door weight">
+        <RowField label="Door weight" hint="Light wooden door ~30 kg, heavy fire door ~120 kg">
           <UnitInput value={inputs.doorWeight} step={1} unit="kg" max={INPUT_MAX.doorWeight}
             onChange={v => update('doorWeight', v)} />
         </RowField>
@@ -230,7 +403,7 @@ function DataPanel({ inputs, update, reset, onHelp }) {
           />
         </RowField>
 
-        <RowField label="Overpressure">
+        <RowField label="Overpressure" hint="Typical building values: 15–50 Pa">
           <UnitInput value={inputs.pressureDifference} step={1} unit="Pa(N/m²)" max={INPUT_MAX.pressureDifference}
             onChange={v => update('pressureDifference', v)} />
         </RowField>
@@ -240,7 +413,7 @@ function DataPanel({ inputs, update, reset, onHelp }) {
             onChange={v => update('frictionTorque', v)} />
         </RowField>
 
-        <RowField label="Equipment" align="start">
+        <RowField label="Equipment" align="start" hint="Higher-quality fittings make the door easier to open">
           <RadioGroup
             value={inputs.equipment}
             onChange={v => update('equipment', v)}
@@ -390,9 +563,39 @@ function SelectionPanel({ selection, doorMoments, doorWeight, doorWidthMm, direc
   if (!selection) {
     return (
       <Panel>
-        <PanelHeader number="3" title="Your selection" subtitle="No closer matches the scenario." />
-        <div style={{ color: T.textMuted, fontSize: 14, padding: '40px 0', textAlign: 'center' }}>
-          Adjust the inputs to see a recommendation.
+        <PanelHeader
+          number="3"
+          title="Your selection"
+          subtitle="Pick a closer from the matrix to see the details."
+        />
+        <div style={{
+          color: T.textMuted,
+          fontSize: 13,
+          padding: '48px 24px 32px',
+          textAlign: 'center',
+          lineHeight: 1.6,
+        }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '10px 16px',
+            background: T.surface,
+            border: `1px dashed ${T.borderStrong}`,
+            borderRadius: 999,
+            marginBottom: 16,
+          }}>
+            <CellIcon state={CELL.WITHIN} />
+            <CellIcon state={CELL.SMALLER} />
+            <CellIcon state={CELL.UNFIT} />
+          </div>
+          <div style={{ color: T.textBody, fontWeight: 600, fontSize: 14, marginBottom: 6 }}>
+            Click any cell in panel 2
+          </div>
+          <div style={{ maxWidth: 280, margin: '0 auto' }}>
+            See the force at the handle, whether the door will close,
+            and the full breakdown of numbers for that closer.
+          </div>
         </div>
       </Panel>
     )
@@ -400,15 +603,12 @@ function SelectionPanel({ selection, doorMoments, doorWeight, doorWidthMm, direc
 
   const { product, enSize, evaluation } = selection
   const isOpposite = direction === 'opposite'
-  // The "primary" status under the force display matches whatever the
-  // matrix evaluates against — opening criterion for hinge-side,
-  // closing criterion for opposite-side (matches ECO Toolbox layout).
-  const primaryOk = isOpposite
-    ? evaluation.canClose
-    : (evaluation.forceAtPusher <= MAX_OPENING_FORCE_N && evaluation.forceAtPusher >= 0)
+  // The matrix already classifies cells as within / smaller / unfit via
+  // evaluation.state — Panel 3 just mirrors that, so we only need the
+  // direction-dependent text for the failure case.
   const primaryFailText = isOpposite
-    ? 'Not suitable for closing the door against the overpressure.'
-    : `Not suitable to open the door with < ${MAX_OPENING_FORCE_N} N force.`
+  ? 'Not suitable for closing the door against the overpressure.'
+  : `Not suitable to open the door with < ${MAX_OPENING_FORCE_N} N force.`
 
   // Negative force or near-zero with opposite direction = overpressure is doing the user's work.
   const overpressureAssists = isOpposite && evaluation.forceAtPusher < evaluation.forceWithoutOverpressure
@@ -440,11 +640,7 @@ function SelectionPanel({ selection, doorMoments, doorWeight, doorWidthMm, direc
             )}
           </span>
         </div>
-        <StatusLine
-          ok={primaryOk}
-          okText="Within the setting recommendation according to EN 1154."
-          failText={primaryFailText}
-        />
+        <MatrixStatusLine state={evaluation.state} unfitText={primaryFailText} />
       </div>
 
       <div style={{ marginBottom: 20 }}>
@@ -492,8 +688,6 @@ function SelectionPanel({ selection, doorMoments, doorWeight, doorWidthMm, direc
 
         <DetailRow label="Door closer" value={`EN${enSize}`} />
         <DetailRow label="Surface" value={`${fmt2(doorMoments.area)} m²`} />
-        {/* Strictly speaking this is a mass moment of inertia (kg·m²); the
-            ECO Toolbox screenshot labels it kg/m² so we follow suit. */}
         <DetailRow label="Inertia" value={`${fmt2(doorMoments.inertia)} kg/m²`} />
         <DetailRow
           label="Moment on door leaf"
@@ -549,7 +743,7 @@ function PanelHeader({ number, title, subtitle }) {
   )
 }
 
-function RowField({ label, info, align = 'center', onInfoClick, children }) {
+function RowField({ label, info, align = 'center', onInfoClick, hint, children }) {
   return (
     <div style={{
       display: 'grid',
@@ -561,11 +755,23 @@ function RowField({ label, info, align = 'center', onInfoClick, children }) {
         <span>{label}</span>
         {info && <InfoIcon onClick={onInfoClick} />}
       </div>
-      <div>{children}</div>
+      <div>
+        {children}
+        {hint && (
+          <div style={{
+            fontSize: 11,
+            color: T.textMuted,
+            marginTop: 4,
+            fontStyle: 'italic',
+            lineHeight: 1.4,
+          }}>
+            {hint}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
-
 function InfoIcon({ onClick }) {
   // Renders as a button when onClick is provided so the icon is keyboard-
   // focusable and screen-reader-discoverable. Falls back to a static span
@@ -834,6 +1040,28 @@ function StatusLine({ ok, okText, failText }) {
       <span style={{ color: ok ? T.greenDark : T.red, fontSize: 13, fontWeight: 500 }}>
         {ok ? okText : failText}
       </span>
+    </div>
+  )
+}
+
+// Used in Panel 3 to keep the displayed status consistent with the cell
+// the user clicked — within/smaller/unfit instead of a binary ok/fail.
+function MatrixStatusLine({ state, unfitText }) {
+  const text = {
+    [CELL.WITHIN]:  'Within the setting recommendation according to EN 1154.',
+    [CELL.SMALLER]: 'Smaller than the setting recommendation according to EN 1154.',
+    [CELL.UNFIT]:   unfitText,
+  }[state]
+  const color = {
+    [CELL.WITHIN]:  T.greenDark,
+    [CELL.SMALLER]: T.yellow,
+    [CELL.UNFIT]:   T.red,
+  }[state]
+  if (!text) return null
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <CellIcon state={state} inline />
+      <span style={{ color, fontSize: 13, fontWeight: 500 }}>{text}</span>
     </div>
   )
 }
