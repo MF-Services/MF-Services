@@ -233,7 +233,7 @@ function IntroSection() {
             doors: easy enough to open by hand, strong enough to close on its own.
           </p>
           <p>
-            It also complies with Part M Guidance.
+            <strong>Door closers chosen also comply with the Part M Guidance.</strong>
           </p>
         </div>
 
